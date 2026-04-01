@@ -129,37 +129,36 @@ button {
 </div>
 
 <script>
-const username = "dem13wi_2";
+const projects = [
+    {
+        id: 123456789,
+        title: "Mein Spiel 1",
+        views: 100
+    },
+    {
+        id: 987654321,
+        title: "Mein Spiel 2",
+        views: 250
+    }
+];
+
 const container = document.getElementById("projects");
 
-async function loadProjects() {
-    try {
-        const res = await fetch(`https://api.scratch.mit.edu/users/${username}/projects`);
-        const data = await res.json();
+projects.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-        data.forEach(p => {
-            const card = document.createElement("div");
-            card.className = "card";
+    card.innerHTML = `
+        <img src="https://uploads.scratch.mit.edu/get_image/project/${p.id}_480x360.png">
+        <div class="card-info">
+            <b>${p.title}</b><br>
+            👁 ${p.views}
+        </div>
+    `;
 
-            card.innerHTML = `
-                <img src="https://uploads.scratch.mit.edu/get_image/project/${p.id}_480x360.png">
-                <div class="card-info">
-                    <b>${p.title}</b><br>
-                    👁 ${p.stats.views}
-                </div>
-            `;
-
-            card.onclick = () => openProject(p.id);
-            container.appendChild(card);
-        });
-
-    } catch (err) {
-        container.innerHTML = "<p>⚠️ Projekte konnten nicht geladen werden (CORS Problem)</p>";
-        console.error(err);
-    }
-}
-
-loadProjects();
+    card.onclick = () => openProject(p.id);
+    container.appendChild(card);
+});
 
 function openProject(id){
     document.getElementById("player").style.display = "flex";
