@@ -179,14 +179,8 @@ textarea {
 
 <!-- COMMENTS -->
 <div class="comments">
-    <h2>💬 Kommentare</h2>
-
-    <div class="comment-box">
-        <textarea id="commentInput" placeholder="Schreibe einen Kommentar..."></textarea>
-        <button onclick="addComment()">Senden</button>
-
-        <div id="commentList"></div>
-    </div>
+    <h2>Infos</h2>
+    <p>Colle Andere Scratcher (deutsche) = </p><a><a href="https://www.example.com/" target="_blank">@Schraubethepigeon</a></a>
 </div>
 
 <script>
@@ -235,47 +229,11 @@ function closePlayer(){
     document.getElementById("frame").src = "";
 }
 
-<p>Chat Narichten Kann Von Jedem Sein Egal Was da steht wenn sie behopten das sie der besitzer sind glauben sie nicht dran weil chat narichten weder verifiziert oder weiteres sind<p>
+
     
-/* COMMENTS SYSTEM */
-
-// 🔒 Escape HTML (wichtig für Sicherheit!)
-function escapeHTML(text) {
-    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-function addComment() {
-    const input = document.getElementById("commentInput");
-    let text = input.value.trim();
-
-    if (!text) return;
-
-    text = escapeHTML(text);
-
-    let comments = JSON.parse(localStorage.getItem("comments") || "[]");
-    comments.push(text);
-    localStorage.setItem("comments", JSON.stringify(comments));
-
-    input.value = "";
-    displayComments();
-}
-
-function displayComments() {
-    const list = document.getElementById("commentList");
-    list.innerHTML = "";
-
-    let comments = JSON.parse(localStorage.getItem("comments") || "[]");
-
-    comments.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "comment";
-        div.textContent = c; // sicher!
-        list.appendChild(div);
-    });
-}
 
 loadProjects();
-displayComments();
+;
 </script>
 
 </body>
