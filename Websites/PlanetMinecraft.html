@@ -290,9 +290,10 @@ async function loadProjects() {
     try {
         // Versuche, Projekte von der Submissions-Seite zu scrapen
         const submissionsUrl = "https://www.planetminecraft.com/member/dem13wi_original/submissions/?morder=order_latest";
-        const proxyUrl = `https://corsproxy.io/?${submissionsUrl}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(submissionsUrl)}`;
         const response = await fetch(proxyUrl);
-        const htmlText = await response.text();
+        const data = await response.json();
+        const htmlText = data.contents;
 
         // Parse HTML
         const parser = new DOMParser();
@@ -324,9 +325,10 @@ async function loadProjects() {
     // Fallback auf RSS (falls verfügbar)
     try {
         const rssUrl = "https://www.planetminecraft.com/rss/projects/";
-        const proxyUrl = `https://corsproxy.io/?${rssUrl}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
         const response = await fetch(proxyUrl);
-        const rssText = await response.text();
+        const data = await response.json();
+        const rssText = data.contents;
 
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(rssText, "text/xml");
