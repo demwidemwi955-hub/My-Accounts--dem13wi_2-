@@ -420,7 +420,14 @@ async function loadProjects() {
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
         const res = await fetch(proxyUrl);
         const data = await res.json();
-        const projects = JSON.parse(data.contents);
+        
+        let projects = [];
+        try {
+            projects = typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents;
+        } catch (e) {
+            console.error("JSON Parse Fehler Projects:", e, data.contents);
+            return;
+        }
 
         const firstGrid = document.getElementById("projects-grid");
         const moreGrid = document.getElementById("projects-more");
@@ -448,7 +455,7 @@ function createProjectCard(p) {
     const title = p.title || "Kein Titel";
     const views = p.stats?.views ?? 0;
     const image = p.image || "https://cdn2.scratch.mit.edu/get_image/project/" + p.id + "_480x360.png";
-    card.innerHTML = '<img src="' + image + '">' + 
+    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/project/default_480x360.png\'">' + 
         '<div class="card-info">' +
         '<b>' + title + '</b><br>' +
         '👁 ' + views +
@@ -471,7 +478,14 @@ async function loadFavorites() {
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
         const res = await fetch(proxyUrl);
         const data = await res.json();
-        const favorites = JSON.parse(data.contents);
+        
+        let favorites = [];
+        try {
+            favorites = typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents;
+        } catch (e) {
+            console.error("JSON Parse Fehler Favorites:", e, data.contents);
+            return;
+        }
 
         const firstGrid = document.getElementById("favorites-grid");
         const moreGrid = document.getElementById("favorites-more");
@@ -507,7 +521,14 @@ async function loadFollowing() {
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
         const res = await fetch(proxyUrl);
         const data = await res.json();
-        const following = JSON.parse(data.contents);
+        
+        let following = [];
+        try {
+            following = typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents;
+        } catch (e) {
+            console.error("JSON Parse Fehler Following:", e, data.contents);
+            return;
+        }
 
         const firstGrid = document.getElementById("following-grid");
         const moreGrid = document.getElementById("following-more");
@@ -543,7 +564,14 @@ async function loadFollowers() {
         const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
         const res = await fetch(proxyUrl);
         const data = await res.json();
-        const followers = JSON.parse(data.contents);
+        
+        let followers = [];
+        try {
+            followers = typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents;
+        } catch (e) {
+            console.error("JSON Parse Fehler Followers:", e, data.contents);
+            return;
+        }
 
         const firstGrid = document.getElementById("followers-grid");
         const moreGrid = document.getElementById("followers-more");
@@ -576,8 +604,8 @@ function createUserCard(user) {
     const card = document.createElement("div");
     card.className = "user-card";
     const name = user.username || "Unbekannt";
-    const image = user.profile?.images?.["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
-    card.innerHTML = '<img src="' + image + '">' +
+    const image = user.profile?.images?.["90x90"] || user.profile?.images["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
+    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png\'">' +
         '<h3>' + name + '</h3>' +
         '<p>Scratcher</p>';
     card.onclick = function() { window.open("https://scratch.mit.edu/users/" + name + "/", "_blank"); };
