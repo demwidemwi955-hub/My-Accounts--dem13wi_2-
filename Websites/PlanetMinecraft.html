@@ -288,9 +288,9 @@ const container = document.getElementById("projects-grid");
 
 async function loadProjects() {
     try {
-        // Versuche, Projekte von der Submissions-Seite zu scrapen
-        const submissionsUrl = "https://www.planetminecraft.com/member/dem13wi_original/submissions/?morder=order_latest";
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(submissionsUrl)}`;
+        // Versuche, Projekte von der Member-Seite zu scrapen
+        const memberUrl = "https://www.planetminecraft.com/member/dem13wi_original/";
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(memberUrl);
         const response = await fetch(proxyUrl);
         const data = await response.json();
         const htmlText = data.contents;
@@ -299,53 +299,52 @@ async function loadProjects() {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, "text/html");
 
-        // Finde Projekt-Links
-        const projectLinks = doc.querySelectorAll('a[href*="/project/"], a[href*="/mod/"], a[href*="/texture-pack/"]');
+        // Finde die Content Gallery Container
+        const projectElements = doc.querySelectorAll('a[href*="/project/"], a[href*="/mod/"], a[href*="/texture-pack/"]');
+        
+        const projects = [];
+        const seenLinks = new Set();
 
-        const projects = Array.from(projectLinks).slice(0, 10).map(link => {
-            const title = link.textContent.trim() || "Kein Titel";
+        projectElements.forEach(link => {
             const href = link.href;
-            // Extrahiere Bild-URL (Platzhalter, da keine Bilder auf der Liste)
-            const image = "https://static.planetminecraft.com/files/avatar/default.png";
-            // Downloads aus dem Text extrahieren (z.B. "150")
-            const downloadMatch = link.textContent.match(/(\d+)/);
-            const downloads = downloadMatch ? parseInt(downloadMatch[1]) : 0;
+            
+            // Verhindere Duplikate
+            if (seenLinks.has(href)) return;
+            seenLinks.add(href);
 
-            return { title, link: href, image, downloads };
-        }).filter(p => p.title !== "Kein Titel" && p.downloads > 0); // Filtere nur gültige Projekte
+            // Extrahiere Projekt-Titel aus dem Link-Text
+            let title = link.textContent.trim();
+            
+            // Entferne doppelte Titel (manchmal sind zwei Links nebeneinander)
+            if (title.length > 100) {
+                title = title.split('\n')[0].trim();
+            }
 
-        if (projects.length > 0) {
-            renderProjects(projects);
+            // Extrahiere die Download/View-Zahlen aus dem nächsten Text nach dem Link
+            let parentText = link.parentElement ? link.parentElement.textContent : '';
+            const numbers = parentText.match(/(\d+)\s*(\d+)?/g) || [];
+            const downloads = numbers.length > 1 ? parseInt(numbers[1]) : parseInt(numbers[0]) || 0;
+
+            if (title && href && title !== "Kein Titel") {
+                projects.push({
+                    title: title,
+                    link: href,
+                    image: "https://static.planetminecraft.com/files/avatar/default.png",
+                    downloads: downloads
+                });
+            }
+        });
+
+        // Filtere und begrenze auf 10 Projekte
+        const uniqueProjects = projects.slice(0, 10);
+
+        if (uniqueProjects.length > 0) {
+            renderProjects(uniqueProjects);
+            console.log("Projekte geladen:", uniqueProjects);
             return;
         }
     } catch (err) {
-        console.log("Scraping fehlgeschlagen, versuche RSS:", err);
-    }
-
-    // Fallback auf RSS (falls verfügbar)
-    try {
-        const rssUrl = "https://www.planetminecraft.com/rss/projects/";
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
-        const rssText = data.contents;
-
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(rssText, "text/xml");
-        const items = xmlDoc.querySelectorAll("item");
-
-        if (items.length > 0) {
-            const projects = Array.from(items).slice(0, 5).map(item => ({
-                title: item.querySelector("title")?.textContent || "Kein Titel",
-                link: item.querySelector("link")?.textContent || "#",
-                image: "https://static.planetminecraft.com/files/avatar/default.png",
-                downloads: 0
-            }));
-            renderProjects(projects);
-            return;
-        }
-    } catch (err) {
-        console.log("RSS fehlgeschlagen:", err);
+        console.log("Scraping fehlgeschlagen:", err);
     }
 
     // Fehlerbehandlung: Projekte konnten nicht geladen werden
@@ -358,22 +357,20 @@ function renderProjects(projects) {
         const card = document.createElement("div");
         card.className = "card";
 
-        card.innerHTML = `
-            <img src="${p.image}" alt="${p.title}" onerror="this.src='https://static.planetminecraft.com/files/avatar/default.png'">
-            <div class="card-info">
-                <b>${p.title}</b><br>
-                ⬇ ${p.downloads} Downloads
-            </div>
-        `;
+        card.innerHTML = '<img src="' + p.image + '" alt="' + p.title + '" onerror="this.src=\'https://static.planetminecraft.com/files/avatar/default.png\'">' +
+            '<div class="card-info">' +
+            '<b>' + p.title + '</b><br>' +
+            '⬇ ' + p.downloads + ' Downloads' +
+            '</div>';
 
-        card.onclick = () => window.open(p.link, '_blank');
+        card.onclick = function() { window.open(p.link, '_blank'); };
         container.appendChild(card);
     });
 }
 
 function showError() {
     container.innerHTML = "<p style='text-align: center; color: #999; font-size: 1.2em;'>⚠️ Projects could not load</p>";
-    setTimeout(() => {
+    setTimeout(function() {
         window.location.href = "./error.html";
     }, 1000);
 }
