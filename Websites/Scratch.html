@@ -407,6 +407,7 @@ textarea {
         <li><a href="#profile"><i class="fas fa-user"></i> Profil</a></li>
         <li><a href="#projects"><i class="fas fa-gamepad"></i> Spiele</a></li>
         <li><a href="#infos"><i class="fas fa-info-circle"></i> Infos</a></li>
+        <li id="back-btn-nav" style="display:none;"><a href="javascript:goBack()"><i class="fas fa-arrow-left"></i> Zurück</a></li>
     </ul>
 </nav>
 
@@ -478,7 +479,7 @@ textarea {
     </div>
 </div>
 
-<div class="comments" id="infos">
+<div class="comments" id="infos-section" style="display:none;">
     <h2>Infos</h2>
     <p>Colle Andere Scratcher (deutsche) = <a href="https://scratch.mit.edu/users/Schraubethepigeon/" target="_blank">@Schraubethepigeon</a></p>
     <p>Colle Andere Accouts Von Mir = <a href="https://www.planetminecraft.com/member/dem13wi_original/" target="_blank">Planet Minecraft Dem13wi_original</a></p>
@@ -502,6 +503,23 @@ function updateUsername() {
     document.getElementById("navbar-username").textContent = username;
     document.getElementById("profile-username").textContent = username;
     document.getElementById("profile-image").src = `https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png`;
+    
+    // Show/hide back button and infos based on username
+    const backBtn = document.getElementById("back-btn-nav");
+    const infosSection = document.getElementById("infos-section");
+    
+    if (username === "dem13wi_2") {
+        backBtn.style.display = "none";
+        infosSection.style.display = "block";
+    } else {
+        backBtn.style.display = "block";
+        infosSection.style.display = "none";
+    }
+}
+
+// Go back to dem13wi_2
+function goBack() {
+    window.location.href = window.location.pathname;
 }
 
 // Load user profile info
@@ -731,7 +749,7 @@ function createUserCard(user) {
     card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png\'">' +
         '<h3>' + name + '</h3>' +
         '<p>Scratcher</p>';
-    card.onclick = function() { window.open("https://scratch.mit.edu/users/" + name + "/", "_blank"); };
+    card.onclick = function() { window.location.href = window.location.pathname + "?u=" + name; };
     return card;
 }
 
