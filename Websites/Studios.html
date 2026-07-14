@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>dem13wi_2 Studios</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    overflow-x: hidden;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.navbar .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 0 15px;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.navbar ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    padding: 50px;
+    padding-top: 80px;
+}
+
+.profile img {
+    object-fit: cover;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 6px solid white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.content {
+    margin-left: 60px;
+}
+
+.content h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 20px;
+    margin-top: 10px;
+    background: white;
+    color: black;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.button:hover {
+    background: #eee;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.button i {
+    margin-right: 8px;
+}
+
+.section {
+    background: white;
+    color: black;
+    padding: 40px;
+    margin-top: 30px;
+    border-radius: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.section h2 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #63fffa;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgb(0, 0, 0);
+}
+
+.card img {
+    width: 100%;
+    transition: 0.3s;
+}
+
+.card:hover img {
+    filter: brightness(1.1);
+}
+
+.card-info {
+    padding: 10px;
+    color: black;
+}
+
+.user-card {
+    background: #f0f0f0;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.user-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 3px solid #4facfe;
+}
+
+.user-card h3 {
+    margin: 10px 0 5px;
+    color: black;
+    font-size: 1.1em;
+}
+
+.user-card p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.player-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.player-iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 61%;
+    height: 88%;
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-iframe iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 14px;
+}
+
+.player-info {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 18%;
+    max-height: 80%;
+    padding: 20px 18px;
+    overflow-y: auto;
+    color: white;
+    background: rgba(0,0,0,0.18);
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.35);
+}
+
+.player-info h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.player-info p {
+    margin: 10px 0;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.player-info-section {
+    margin-bottom: 20px;
+}
+
+.player-info-section h3 {
+    font-size: 1.1em;
+    color: #4facfe;
+    margin-bottom: 8px;
+}
+
+.controls {
+    position: fixed;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    text-align: center;
+    z-index: 2005;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #555;
+}
+
+.footer {
+    background: #000;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+}
+
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-gamepad"></i> <span id="navbar-username">dem13wi_2</span></div>
+    <ul>
+        <li><a href="Scratch.html"><i class="fas fa-user"></i> Mein Profil</a></li>
+        <li><a href="#featured-projects"><i class="fas fa-star"></i> Featured</a></li>
+        <li><a href="#featured-scratcher"><i class="fas fa-users"></i> Scratcher</a></li>
+    </ul>
+</nav>
+
+<div class="container" id="profile">
+    <div class="profile">
+        <img id="profile-image" src="https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png">
+    </div>
+
+    <div class="content">
+        <h1>Studio Highlights</h1>
+        <p>Featured Projects & Scratcher aus unserem Studio</p>
+        <a class="button" href="https://scratch.mit.edu/studios/51811895/" target="_blank">
+            <i class="fas fa-external-link-alt"></i> Zum Studio
+        </a>
+    </div>
+</div>
+
+<div class="section">
+    <h2>⭐ Featured Projects</h2>
+    <p class="section-subtitle">Ausgewählte Projekte aus dem Studio</p>
+    <div class="grid" id="featured-projects-grid"></div>
+</div>
+
+<div class="section">
+    <h2>👥 Featured Scratcher</h2>
+    <p class="section-subtitle">Talentierte Creator, die wir empfehlen</p>
+    <div class="grid" id="featured-scratcher-grid"></div>
+</div>
+
+<div class="player" id="player">
+    <div class="player-content">
+        <div class="controls">
+            <button onclick="closePlayer()">❌ Schließen</button>
+        </div>
+        <div class="player-iframe">
+            <iframe id="frame"></iframe>
+        </div>
+        <div class="player-info" id="player-info">
+            <h2 id="project-title">Projekt laden...</h2>
+            <div class="player-info-section">
+                <h3>Beschreibung</h3>
+                <p id="project-description">Lädt...</p>
+            </div>
+            <div class="player-info-section">
+                <h3>Anmerkungen</h3>
+                <p id="project-instructions">Lädt...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2026 dem13wi_2 - Studio Highlights <i class="fas fa-heart"></i></p>
+</footer>
+
+<script>
+// ===== FEATURED SCRATCHER LISTE =====
+const featuredScratcher = [
+    { name: "Scraubethepigeon", url: "https://scratch.mit.edu/users/Schraubethepigeon/" },
+    { name: "griffpatch", url: "https://scratch.mit.edu/users/griffpatch/" },
+    { name: "TimMcCool", url: "https://scratch.mit.edu/users/TimMcCool/" },
+    { name: "Paddle2See", url: "https://scratch.mit.edu/users/Paddle2See/" },
+    { name: "TNFTNT", url: "https://scratch.mit.edu/users/TNFTNT/" },
+    { name: "coder123456789", url: "https://scratch.mit.edu/users/coder123456789/" }
+];
+
+// ===== STUDIO ID =====
+const STUDIO_ID = 51811895;
+
+// ===== LOAD FEATURED PROJECTS FROM STUDIO =====
+async function loadFeaturedProjects() {
+    try {
+        const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}/projects`;
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        
+        let projects = [];
+        try {
+            projects = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
+        } catch (e) {
+            console.error("JSON Parse Fehler Projects:", e);
+            return;
+        }
+
+        const grid = document.getElementById("featured-projects-grid");
+        
+        // Zeige max 6 Projekte
+        projects.slice(0, 6).forEach(p => {
+            grid.appendChild(createProjectCard(p));
+        });
+
+        if (projects.length === 0) {
+            grid.innerHTML = "<p>⚠️ Keine Projekte gefunden.</p>";
+        }
+    } catch (err) {
+        console.log("Fehler beim Laden von Featured Projects:", err);
+        document.getElementById("featured-projects-grid").innerHTML = "<p>⚠️ Projekte konnten nicht geladen werden.</p>";
+    }
+}
+
+// ===== CREATE PROJECT CARD =====
+function createProjectCard(p) {
+    const card = document.createElement("div");
+    card.className = "card";
+    const title = p.title || "Kein Titel";
+    const views = p.stats?.views ?? 0;
+    const image = p.image || "https://cdn2.scratch.mit.edu/get_image/project/" + p.id + "_480x360.png";
+    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/project/default_480x360.png\'">' + 
+        '<div class="card-info">' +
+        '<b>' + title + '</b><br>' +
+        '👁 ' + views +
+        '</div>';
+    card.onclick = function() { openProject(p); };
+    return card;
+}
+
+// ===== LOAD FEATURED SCRATCHER PROFILE INFO =====
+async function loadFeaturedScratcher() {
+    const grid = document.getElementById("featured-scratcher-grid");
+    
+    for (const scratcher of featuredScratcher) {
+        try {
+            const url = "https://api.scratch.mit.edu/users/" + scratcher.name;
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+            const res = await fetch(proxyUrl);
+            const data = await res.json();
+            
+            if (data) {
+                grid.appendChild(createUserCard(data, scratcher.url));
+            }
+        } catch (err) {
+            console.log("Fehler beim Laden von " + scratcher.name + ":", err);
+            // Fallback: Zeige Scratcher auch ohne Profilbild
+            grid.appendChild(createUserCardFallback(scratcher.name, scratcher.url));
+        }
+    }
+}
+
+// ===== CREATE USER CARD =====
+function createUserCard(user, profileUrl) {
+    const card = document.createElement("div");
+    card.className = "user-card";
+    const name = user.username || "Unbekannt";
+    const image = user.profile?.images?.["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
+    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png\'">' +
+        '<h3>' + name + '</h3>' +
+        '<p>Scratcher</p>';
+    card.onclick = function() { window.open(profileUrl, "_blank"); };
+    return card;
+}
+
+// ===== CREATE USER CARD FALLBACK =====
+function createUserCardFallback(name, profileUrl) {
+    const card = document.createElement("div");
+    card.className = "user-card";
+    card.innerHTML = '<img src="https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png">' +
+        '<h3>' + name + '</h3>' +
+        '<p>Scratcher</p>';
+    card.onclick = function() { window.open(profileUrl, "_blank"); };
+    return card;
+}
+
+// ===== PROJECT PLAYER =====
+function openProject(project) {
+    document.getElementById("player").style.display = "block";
+    document.getElementById("frame").src = "https://turbowarp.org/" + project.id + "/embed";
+    document.getElementById("project-title").textContent = project.title || "Kein Titel";
+    document.getElementById("project-description").textContent = project.description || "Keine Beschreibung verfügbar";
+    document.getElementById("project-instructions").textContent = project.instructions || "Keine Anmerkungen verfügbar";
+}
+
+function closePlayer() {
+    document.getElementById("player").style.display = "none";
+    document.getElementById("frame").src = "";
+    document.getElementById("project-title").textContent = "Projekt laden...";
+    document.getElementById("project-description").textContent = "Lädt...";
+    document.getElementById("project-instructions").textContent = "Lädt...";
+}
+
+// ===== INIT =====
+loadFeaturedProjects();
+loadFeaturedScratcher();
+</script>
+
+</body>
+</html>
