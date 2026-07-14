@@ -19,32 +19,59 @@ body {
     width: 100%;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
-    padding: 5px 20px;
+    padding: 10px 20px;
     z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    min-height: 120px;
-    flex-wrap: wrap;
+    min-height: 60px;
+    flex-wrap: nowrap;
 }
 
 .navbar .logo {
     font-size: 1.2em;
     font-weight: bold;
-    flex-basis: 100%;
     padding: 5px 0;
+    flex: 0 0 auto;
 }
 
-.navbar-controls {
+.navbar ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    margin: 0 15px;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 8px;
+    transition: 0.3s;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.navbar ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* STUDIO CONTROLS - moved out of the navbar and placed under it */
+.studio-controls {
     display: flex;
     gap: 10px;
     align-items: center;
-    flex-basis: 100%;
-    padding-bottom: 8px;
+    padding: 10px 20px;
+    margin-top: 70px; /* push below fixed navbar */
+    flex-wrap: wrap;
+    z-index: 900;
 }
 
-.navbar-controls input {
+.studio-controls input {
     padding: 10px;
     border: none;
     border-radius: 8px;
@@ -52,7 +79,7 @@ body {
     font-size: 0.9em;
 }
 
-.navbar-controls button {
+.studio-controls button {
     padding: 10px 20px;
     background: #4facfe;
     color: white;
@@ -63,12 +90,12 @@ body {
     transition: 0.3s;
 }
 
-.navbar-controls button:hover:not(:disabled) {
+.studio-controls button:hover:not(:disabled) {
     background: #00f2fe;
     color: black;
 }
 
-.navbar-controls button:disabled {
+.studio-controls button:disabled {
     background: #ccc;
     cursor: not-allowed;
 }
@@ -77,7 +104,6 @@ body {
     display: flex;
     gap: 10px;
     align-items: center;
-    flex-basis: 100%;
 }
 
 .project-preview img {
@@ -97,33 +123,6 @@ body {
 .project-preview-info p {
     margin: 0;
     line-height: 1.3;
-}
-
-.navbar ul {
-    list-style: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    flex-basis: 100%;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.navbar ul li {
-    margin: 0 15px;
-}
-
-.navbar ul li a {
-    color: white;
-    text-decoration: none;
-    padding: 8px;
-    transition: 0.3s;
-    border-radius: 5px;
-    font-size: 0.9em;
-}
-
-.navbar ul li a:hover {
-    background: rgba(255, 255, 255, 0.2);
 }
 
 .main-content {
@@ -400,26 +399,26 @@ button:hover {
 
 <nav class="navbar">
     <div class="logo"><i class="fas fa-gamepad"></i> Studio 51811895</div>
-    
-    <div class="navbar-controls">
-        <input type="text" id="project-input" placeholder="Projekt ID oder URL eingeben..." />
-        <button id="play-btn" onclick="playFromInput()" disabled>
-            <i class="fas fa-play"></i> Play
-        </button>
-        
-        <div class="project-preview" id="project-preview" style="display:none;">
-            <img id="preview-image" src="" alt="Project Preview">
-            <div class="project-preview-info">
-                <p><strong id="preview-title">Projekt</strong></p>
-                <p id="preview-id">ID: -</p>
-            </div>
-        </div>
-    </div>
-    
     <ul>
         <li><a href="Scratch.html"><i class="fas fa-user"></i> Profil</a></li>
     </ul>
 </nav>
+
+<!-- STUDIO CONTROLS: moved out of the navbar and placed here -->
+<div class="studio-controls">
+    <input type="text" id="project-input" placeholder="Projekt ID oder URL eingeben..." />
+    <button id="play-btn" onclick="playFromInput()" disabled>
+        <i class="fas fa-play"></i> Play
+    </button>
+    
+    <div class="project-preview" id="project-preview" style="display:none;">
+        <img id="preview-image" src="" alt="Project Preview">
+        <div class="project-preview-info">
+            <p><strong id="preview-title">Projekt</strong></p>
+            <p id="preview-id">ID: -</p>
+        </div>
+    </div>
+</div>
 
 <div class="main-content">
 
