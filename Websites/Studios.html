@@ -426,30 +426,11 @@ button:hover {
 </div>
 
 <script>
-// ===== FEATURED SCRATCHER LISTE =====
-const featuredScratcherList = [
-    { name: "Scraubethepigeon" },
-    { name: "griffpatch" },
-    { name: "TimMcCool" },
-    { name: "Paddle2See" },
-    { name: "TNFTNT" },
-    { name: "coder123456789" },
-    { name: "griffpatch" },
-    { name: "kaj" },
-    { name: "jgellfie" },
-    { name: "MagicCrayon" },
-    { name: "maximouse" },
-    { name: "lightningstrike" },
-    { name: "pufferfish8" },
-    { name: "Alexstrazsa" },
-    { name: "Surferdudeman" },
-    { name: "tess106" },
-    { name: "Zartarg" }
-];
-
 // ===== STUDIO ID =====
 const STUDIO_ID = 51811895;
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_ROW = 4; // 4 items pro Reihe
+const MAX_ROWS = 10; // Max 10 Reihen
+const ITEMS_PER_PAGE = ITEMS_PER_ROW * MAX_ROWS; // 40 items pro Seite
 
 // ===== PAGINATION STATE =====
 let projectsData = [];
@@ -458,6 +439,40 @@ let projectsCurrentPage = 1;
 let scratcherCurrentPage = 1;
 let projectsExpanded = false;
 let scratcherExpanded = false;
+
+// ===== PARSE GOOD SCRATHERS FROM STUDIO DESCRIPTION =====
+function parseScratchersFromDescription(description) {
+    if (!description) return [];
+    
+    const scratcherMatch = description.match(/Good Scrathers?\s*[=:]\s*(.+?)(?:\n|$)/i);
+    if (!scratcherMatch) return [];
+    
+    const scratchersText = scratcherMatch[1];
+    const scratcherNames = [];
+    
+    // Split by comma for multiple entries
+    const parts = scratchersText.split(',');
+    
+    for (let part of parts) {
+        part = part.trim();
+        
+        // Prüfe auf @ und nehme alles bis zum nächsten Space
+        const atIndex = part.indexOf('@');
+        if (atIndex !== -1) {
+            const nameStart = atIndex + 1;
+            const spaceIndex = part.indexOf(' ', nameStart);
+            const name = spaceIndex === -1 
+                ? part.substring(nameStart).trim() 
+                : part.substring(nameStart, spaceIndex).trim();
+            
+            if (name.length > 0) {
+                scratcherNames.push(name);
+            }
+        }
+    }
+    
+    return scratcherNames;
+}
 
 // ===== LOAD FEATURED PROJECTS FROM STUDIO =====
 async function loadFeaturedProjects() {
@@ -566,35 +581,54 @@ function createProjectCard(p) {
     return card;
 }
 
-// ===== LOAD FEATURED SCRATCHER =====
+// ===== LOAD FEATURED SCRATCHER FROM STUDIO DESCRIPTION =====
 async function loadFeaturedScratcher() {
-    const firstGrid = document.getElementById("featured-scratcher-grid");
-    
-    // Load all scratcher data
-    for (let i = 0; i < featuredScratcherList.length; i++) {
-        try {
-            const scratcher = featuredScratcherList[i];
-            const url = "https://api.scratch.mit.edu/users/" + scratcher.name;
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-            const res = await fetch(proxyUrl);
-            const data = await res.json();
-            
-            if (data) {
-                scratcherData.push(data);
-                // First one in featured
-                if (i === 0) {
-                    firstGrid.appendChild(createUserCard(data));
-                }
-            }
-        } catch (err) {
-            console.log("Fehler beim Laden von " + featuredScratcherList[i].name + ":", err);
+    try {
+        const url = `https://api.scratch.mit.edu/studios/${STUDIO_ID}`;
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const res = await fetch(proxyUrl);
+        const studioData = await res.json();
+        
+        // Parse scratcher names from description
+        const scratcherNames = parseScratchersFromDescription(studioData.description);
+        
+        if (scratcherNames.length === 0) {
+            document.getElementById("featured-scratcher-grid").innerHTML = "<p>⚠️ Keine Featured Scratcher definiert.</p>";
+            return;
         }
-    }
-    
-    // Wenn mehr Scratcher, zeige expand Button
-    if (scratcherData.length > 1) {
-        document.getElementById("expand-scratcher-btn").style.display = "block";
-        displayScratcherPage(1);
+        
+        const firstGrid = document.getElementById("featured-scratcher-grid");
+        
+        // Load all scratcher data
+        for (let i = 0; i < scratcherNames.length; i++) {
+            try {
+                const name = scratcherNames[i];
+                const url = "https://api.scratch.mit.edu/users/" + name;
+                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+                
+                if (data) {
+                    scratcherData.push(data);
+                    // First one in featured
+                    if (i === 0) {
+                        firstGrid.appendChild(createUserCard(data));
+                    }
+                }
+            } catch (err) {
+                console.log("Fehler beim Laden von " + scratcherNames[i] + ":", err);
+            }
+        }
+        
+        // Wenn mehr Scratcher, zeige expand Button
+        if (scratcherData.length > 1) {
+            document.getElementById("expand-scratcher-btn").style.display = "block";
+            displayScratcherPage(1);
+        }
+        
+    } catch (err) {
+        console.log("Fehler beim Laden der Studio-Beschreibung:", err);
+        document.getElementById("featured-scratcher-grid").innerHTML = "<p>⚠️ Fehler beim Laden der Scratcher.</p>";
     }
 }
 
