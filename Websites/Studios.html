@@ -19,16 +19,17 @@ body {
     width: 100%;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
-    padding: 10px 20px;
+    padding: 5px 20px;
     z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    height: 40px;
 }
 
 .navbar .logo {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -46,98 +47,43 @@ body {
 .navbar ul li a {
     color: white;
     text-decoration: none;
-    padding: 10px;
+    padding: 8px;
     transition: 0.3s;
     border-radius: 5px;
+    font-size: 0.9em;
 }
 
 .navbar ul li a:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.container {
-    display: flex;
-    align-items: center;
-    min-height: 100vh;
-    padding: 50px;
-    padding-top: 80px;
-}
-
-.profile img {
-    object-fit: cover;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    border: 6px solid white;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-.content {
-    margin-left: 60px;
-}
-
-.content h1 {
-    font-size: 3em;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.button {
-    display: inline-block;
-    padding: 12px 20px;
-    margin-top: 10px;
-    background: white;
-    color: black;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: 0.3s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.button:hover {
-    background: #eee;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-}
-
-.button i {
-    margin-right: 8px;
+.main-content {
+    padding-top: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
 }
 
 .section {
     background: white;
     color: black;
-    padding: 40px;
-    margin-top: 30px;
-    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 15px;
     position: relative;
     z-index: 1;
 }
 
 .section h2 {
-    text-align: center;
-    font-size: 2.5em;
-    margin-bottom: 10px;
-}
-
-.section-subtitle {
-    text-align: center;
-    font-size: 1.1em;
-    color: #666;
-    margin-bottom: 30px;
-    font-style: italic;
+    margin: 0 0 20px 0;
+    font-size: 2em;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
+    margin-bottom: 20px;
 }
 
 .card {
@@ -156,6 +102,8 @@ body {
 
 .card img {
     width: 100%;
+    height: 180px;
+    object-fit: cover;
     transition: 0.3s;
 }
 
@@ -166,6 +114,12 @@ body {
 .card-info {
     padding: 10px;
     color: black;
+    font-size: 0.9em;
+}
+
+.card-info b {
+    display: block;
+    margin-bottom: 5px;
 }
 
 .user-card {
@@ -189,17 +143,18 @@ body {
     border-radius: 50%;
     margin-bottom: 10px;
     border: 3px solid #4facfe;
+    object-fit: cover;
 }
 
 .user-card h3 {
     margin: 10px 0 5px;
     color: black;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 .user-card p {
     color: #666;
-    font-size: 0.9em;
+    font-size: 0.85em;
     margin: 0;
 }
 
@@ -281,7 +236,7 @@ body {
 
 .controls {
     position: fixed;
-    bottom: -10px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     padding: 10px;
@@ -299,18 +254,74 @@ button {
     background: #333;
     color: white;
     transition: 0.3s;
+    font-size: 0.9em;
 }
 
 button:hover {
     background: #555;
 }
 
-.footer {
-    background: #000;
+.expand-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background: #4facfe;
     color: white;
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.expand-btn:hover {
+    background: #00f2fe;
+    color: black;
+}
+
+.hidden-grid {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.hidden-grid.show {
+    max-height: 10000px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    background: #4facfe;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pagination button:hover {
+    background: #00f2fe;
+    color: black;
+}
+
+.pagination button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    color: black;
+    font-weight: bold;
+    font-size: 0.95em;
 }
 
 </style>
@@ -319,40 +330,79 @@ button:hover {
 <body>
 
 <nav class="navbar">
-    <div class="logo"><i class="fas fa-gamepad"></i> <span id="navbar-username">dem13wi_2</span></div>
+    <div class="logo"><i class="fas fa-gamepad"></i> Studio 51811895</div>
     <ul>
-        <li><a href="Scratch.html"><i class="fas fa-user"></i> Mein Profil</a></li>
-        <li><a href="#featured-projects"><i class="fas fa-star"></i> Featured</a></li>
-        <li><a href="#featured-scratcher"><i class="fas fa-users"></i> Scratcher</a></li>
+        <li><a href="Scratch.html"><i class="fas fa-user"></i> Profil</a></li>
     </ul>
 </nav>
 
-<div class="container" id="profile">
-    <div class="profile">
-        <img id="profile-image" src="https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png">
-    </div>
+<div class="main-content">
 
-    <div class="content">
-        <h1>Studio Highlights</h1>
-        <p>Featured Projects & Scratcher aus unserem Studio</p>
-        <a class="button" href="https://scratch.mit.edu/studios/51811895/" target="_blank">
-            <i class="fas fa-external-link-alt"></i> Zum Studio
-        </a>
-    </div>
-</div>
-
+<!-- FEATURED PROJECTS SECTION -->
 <div class="section">
     <h2>⭐ Featured Projects</h2>
-    <p class="section-subtitle">Ausgewählte Projekte aus dem Studio</p>
+    
+    <!-- Featured Project (aktuell) -->
     <div class="grid" id="featured-projects-grid"></div>
+    
+    <!-- Expand Button -->
+    <button class="expand-btn" id="expand-projects-btn" onclick="toggleProjects()" style="display:none;">
+        <i class="fas fa-chevron-down"></i> Alle Projekte anzeigen
+    </button>
+    
+    <!-- Hidden Grid für alle anderen Projekte -->
+    <div class="hidden-grid" id="projects-hidden">
+        <div class="grid" id="projects-grid"></div>
+        
+        <!-- Pagination für Projekte -->
+        <div class="pagination" id="projects-pagination" style="display:none;">
+            <button id="projects-prev" onclick="prevProjectsPage()" disabled>
+                <i class="fas fa-chevron-left"></i> Zurück
+            </button>
+            <span class="pagination-info">
+                Seite <span id="projects-page">1</span> von <span id="projects-total">1</span>
+            </span>
+            <button id="projects-next" onclick="nextProjectsPage()" disabled>
+                Weiter <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
+<!-- FEATURED SCRATCHER SECTION -->
 <div class="section">
     <h2>👥 Featured Scratcher</h2>
-    <p class="section-subtitle">Talentierte Creator, die wir empfehlen</p>
+    
+    <!-- Featured Scratcher (aktuell) -->
     <div class="grid" id="featured-scratcher-grid"></div>
+    
+    <!-- Expand Button -->
+    <button class="expand-btn" id="expand-scratcher-btn" onclick="toggleScratcher()" style="display:none;">
+        <i class="fas fa-chevron-down"></i> Alle Scratcher anzeigen
+    </button>
+    
+    <!-- Hidden Grid für alle anderen Scratcher -->
+    <div class="hidden-grid" id="scratcher-hidden">
+        <div class="grid" id="scratcher-grid"></div>
+        
+        <!-- Pagination für Scratcher -->
+        <div class="pagination" id="scratcher-pagination" style="display:none;">
+            <button id="scratcher-prev" onclick="prevScratcherPage()" disabled>
+                <i class="fas fa-chevron-left"></i> Zurück
+            </button>
+            <span class="pagination-info">
+                Seite <span id="scratcher-page">1</span> von <span id="scratcher-total">1</span>
+            </span>
+            <button id="scratcher-next" onclick="nextScratcherPage()" disabled>
+                Weiter <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
+</div>
+
+<!-- PLAYER MODAL -->
 <div class="player" id="player">
     <div class="player-content">
         <div class="controls">
@@ -375,23 +425,39 @@ button:hover {
     </div>
 </div>
 
-<footer class="footer">
-    <p>© 2026 dem13wi_2 - Studio Highlights <i class="fas fa-heart"></i></p>
-</footer>
-
 <script>
 // ===== FEATURED SCRATCHER LISTE =====
-const featuredScratcher = [
-    { name: "Scraubethepigeon", url: "https://scratch.mit.edu/users/Schraubethepigeon/" },
-    { name: "griffpatch", url: "https://scratch.mit.edu/users/griffpatch/" },
-    { name: "TimMcCool", url: "https://scratch.mit.edu/users/TimMcCool/" },
-    { name: "Paddle2See", url: "https://scratch.mit.edu/users/Paddle2See/" },
-    { name: "TNFTNT", url: "https://scratch.mit.edu/users/TNFTNT/" },
-    { name: "coder123456789", url: "https://scratch.mit.edu/users/coder123456789/" }
+const featuredScratcherList = [
+    { name: "Scraubethepigeon" },
+    { name: "griffpatch" },
+    { name: "TimMcCool" },
+    { name: "Paddle2See" },
+    { name: "TNFTNT" },
+    { name: "coder123456789" },
+    { name: "griffpatch" },
+    { name: "kaj" },
+    { name: "jgellfie" },
+    { name: "MagicCrayon" },
+    { name: "maximouse" },
+    { name: "lightningstrike" },
+    { name: "pufferfish8" },
+    { name: "Alexstrazsa" },
+    { name: "Surferdudeman" },
+    { name: "tess106" },
+    { name: "Zartarg" }
 ];
 
 // ===== STUDIO ID =====
 const STUDIO_ID = 51811895;
+const ITEMS_PER_PAGE = 10;
+
+// ===== PAGINATION STATE =====
+let projectsData = [];
+let scratcherData = [];
+let projectsCurrentPage = 1;
+let scratcherCurrentPage = 1;
+let projectsExpanded = false;
+let scratcherExpanded = false;
 
 // ===== LOAD FEATURED PROJECTS FROM STUDIO =====
 async function loadFeaturedProjects() {
@@ -409,19 +475,78 @@ async function loadFeaturedProjects() {
             return;
         }
 
-        const grid = document.getElementById("featured-projects-grid");
+        projectsData = projects;
         
-        // Zeige max 6 Projekte
-        projects.slice(0, 6).forEach(p => {
-            grid.appendChild(createProjectCard(p));
-        });
-
-        if (projects.length === 0) {
-            grid.innerHTML = "<p>⚠️ Keine Projekte gefunden.</p>";
+        // Zeige first Featured Project
+        if (projects.length > 0) {
+            const firstGrid = document.getElementById("featured-projects-grid");
+            firstGrid.appendChild(createProjectCard(projects[0]));
         }
+        
+        // Wenn mehr Projekte, zeige expand Button
+        if (projects.length > 1) {
+            document.getElementById("expand-projects-btn").style.display = "block";
+            displayProjectsPage(1);
+        }
+
     } catch (err) {
         console.log("Fehler beim Laden von Featured Projects:", err);
         document.getElementById("featured-projects-grid").innerHTML = "<p>⚠️ Projekte konnten nicht geladen werden.</p>";
+    }
+}
+
+// ===== DISPLAY PROJECTS PAGE =====
+function displayProjectsPage(page) {
+    const grid = document.getElementById("projects-grid");
+    grid.innerHTML = "";
+    
+    const startIdx = (page - 1) * ITEMS_PER_PAGE + 1; // +1 weil das erste Projekt featured ist
+    const endIdx = startIdx + ITEMS_PER_PAGE;
+    const projectsPage = projectsData.slice(startIdx, endIdx);
+    
+    projectsPage.forEach(p => {
+        grid.appendChild(createProjectCard(p));
+    });
+    
+    // Pagination
+    const totalPages = Math.ceil((projectsData.length - 1) / ITEMS_PER_PAGE);
+    document.getElementById("projects-page").textContent = page;
+    document.getElementById("projects-total").textContent = totalPages;
+    document.getElementById("projects-prev").disabled = page === 1;
+    document.getElementById("projects-next").disabled = page === totalPages;
+    
+    if (totalPages > 1) {
+        document.getElementById("projects-pagination").style.display = "flex";
+    }
+}
+
+function toggleProjects() {
+    projectsExpanded = !projectsExpanded;
+    const hidden = document.getElementById("projects-hidden");
+    const btn = document.getElementById("expand-projects-btn");
+    
+    if (projectsExpanded) {
+        hidden.classList.add("show");
+        btn.innerHTML = '<i class="fas fa-chevron-up"></i> Alle Projekte verbergen';
+        displayProjectsPage(1);
+    } else {
+        hidden.classList.remove("show");
+        btn.innerHTML = '<i class="fas fa-chevron-down"></i> Alle Projekte anzeigen';
+    }
+}
+
+function nextProjectsPage() {
+    const totalPages = Math.ceil((projectsData.length - 1) / ITEMS_PER_PAGE);
+    if (projectsCurrentPage < totalPages) {
+        projectsCurrentPage++;
+        displayProjectsPage(projectsCurrentPage);
+    }
+}
+
+function prevProjectsPage() {
+    if (projectsCurrentPage > 1) {
+        projectsCurrentPage--;
+        displayProjectsPage(projectsCurrentPage);
     }
 }
 
@@ -434,37 +559,102 @@ function createProjectCard(p) {
     const image = p.image || "https://cdn2.scratch.mit.edu/get_image/project/" + p.id + "_480x360.png";
     card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/project/default_480x360.png\'">' + 
         '<div class="card-info">' +
-        '<b>' + title + '</b><br>' +
+        '<b>' + title + '</b>' +
         '👁 ' + views +
         '</div>';
     card.onclick = function() { openProject(p); };
     return card;
 }
 
-// ===== LOAD FEATURED SCRATCHER PROFILE INFO =====
+// ===== LOAD FEATURED SCRATCHER =====
 async function loadFeaturedScratcher() {
-    const grid = document.getElementById("featured-scratcher-grid");
+    const firstGrid = document.getElementById("featured-scratcher-grid");
     
-    for (const scratcher of featuredScratcher) {
+    // Load all scratcher data
+    for (let i = 0; i < featuredScratcherList.length; i++) {
         try {
+            const scratcher = featuredScratcherList[i];
             const url = "https://api.scratch.mit.edu/users/" + scratcher.name;
             const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
             const res = await fetch(proxyUrl);
             const data = await res.json();
             
             if (data) {
-                grid.appendChild(createUserCard(data, scratcher.url));
+                scratcherData.push(data);
+                // First one in featured
+                if (i === 0) {
+                    firstGrid.appendChild(createUserCard(data));
+                }
             }
         } catch (err) {
-            console.log("Fehler beim Laden von " + scratcher.name + ":", err);
-            // Fallback: Zeige Scratcher auch ohne Profilbild
-            grid.appendChild(createUserCardFallback(scratcher.name, scratcher.url));
+            console.log("Fehler beim Laden von " + featuredScratcherList[i].name + ":", err);
         }
+    }
+    
+    // Wenn mehr Scratcher, zeige expand Button
+    if (scratcherData.length > 1) {
+        document.getElementById("expand-scratcher-btn").style.display = "block";
+        displayScratcherPage(1);
+    }
+}
+
+// ===== DISPLAY SCRATCHER PAGE =====
+function displayScratcherPage(page) {
+    const grid = document.getElementById("scratcher-grid");
+    grid.innerHTML = "";
+    
+    const startIdx = (page - 1) * ITEMS_PER_PAGE + 1; // +1 weil der erste Scratcher featured ist
+    const endIdx = startIdx + ITEMS_PER_PAGE;
+    const scratcherPage = scratcherData.slice(startIdx, endIdx);
+    
+    scratcherPage.forEach(u => {
+        grid.appendChild(createUserCard(u));
+    });
+    
+    // Pagination
+    const totalPages = Math.ceil((scratcherData.length - 1) / ITEMS_PER_PAGE);
+    document.getElementById("scratcher-page").textContent = page;
+    document.getElementById("scratcher-total").textContent = totalPages;
+    document.getElementById("scratcher-prev").disabled = page === 1;
+    document.getElementById("scratcher-next").disabled = page === totalPages;
+    
+    if (totalPages > 1) {
+        document.getElementById("scratcher-pagination").style.display = "flex";
+    }
+}
+
+function toggleScratcher() {
+    scratcherExpanded = !scratcherExpanded;
+    const hidden = document.getElementById("scratcher-hidden");
+    const btn = document.getElementById("expand-scratcher-btn");
+    
+    if (scratcherExpanded) {
+        hidden.classList.add("show");
+        btn.innerHTML = '<i class="fas fa-chevron-up"></i> Alle Scratcher verbergen';
+        displayScratcherPage(1);
+    } else {
+        hidden.classList.remove("show");
+        btn.innerHTML = '<i class="fas fa-chevron-down"></i> Alle Scratcher anzeigen';
+    }
+}
+
+function nextScratcherPage() {
+    const totalPages = Math.ceil((scratcherData.length - 1) / ITEMS_PER_PAGE);
+    if (scratcherCurrentPage < totalPages) {
+        scratcherCurrentPage++;
+        displayScratcherPage(scratcherCurrentPage);
+    }
+}
+
+function prevScratcherPage() {
+    if (scratcherCurrentPage > 1) {
+        scratcherCurrentPage--;
+        displayScratcherPage(scratcherCurrentPage);
     }
 }
 
 // ===== CREATE USER CARD =====
-function createUserCard(user, profileUrl) {
+function createUserCard(user) {
     const card = document.createElement("div");
     card.className = "user-card";
     const name = user.username || "Unbekannt";
@@ -472,18 +662,7 @@ function createUserCard(user, profileUrl) {
     card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png\'">' +
         '<h3>' + name + '</h3>' +
         '<p>Scratcher</p>';
-    card.onclick = function() { window.open(profileUrl, "_blank"); };
-    return card;
-}
-
-// ===== CREATE USER CARD FALLBACK =====
-function createUserCardFallback(name, profileUrl) {
-    const card = document.createElement("div");
-    card.className = "user-card";
-    card.innerHTML = '<img src="https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png">' +
-        '<h3>' + name + '</h3>' +
-        '<p>Scratcher</p>';
-    card.onclick = function() { window.open(profileUrl, "_blank"); };
+    card.onclick = function() { window.open("https://scratch.mit.edu/users/" + name + "/", "_blank"); };
     return card;
 }
 
