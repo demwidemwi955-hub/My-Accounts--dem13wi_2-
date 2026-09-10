@@ -526,7 +526,7 @@ function goBack() {
 async function loadUserProfile() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username;
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const proxyUrl = url; //no proxy anymore
         const res = await fetch(proxyUrl);
         let data = res.ok ? await res.json() : null;
         
@@ -558,7 +558,7 @@ loadUserProfile();
 async function loadProjects() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/projects";
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const proxyUrl = url); //no proxy
         const res = await fetch(proxyUrl);
         const data = await res.json();
         
@@ -616,7 +616,7 @@ function toggleProjects() {
 async function loadFavorites() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/favorites";
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const proxyUrl = url; //dont need proxy
         const res = await fetch(proxyUrl);
         const data = await res.json();
         
