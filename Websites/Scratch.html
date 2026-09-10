@@ -659,7 +659,7 @@ function toggleFavorites() {
 async function loadFollowing() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/following";
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+        const proxyUrl = url; // dont need proxy
         const res = await fetch(proxyUrl);
         const data = await res.json();
         
