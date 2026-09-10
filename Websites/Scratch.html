@@ -534,41 +534,90 @@ function buildScratchRequestUrls(url) {
         { name: "proxy.cors.sh", url: "https://proxy.cors.sh/" + url },
         { name: "corsproxy.com", url: "https://www.corsproxy.com/" + encodeURIComponent(url) },
         { name: "whateverorigin", url: "https://whateverorigin.org/get?url=" + encodeURIComponent(url) },
-        { name: "yacdn.org", url: "https://yacdn.org/proxy/" + url }
+        { name: "yacdn.org", url: "https://yacdn.org/proxy/" + url },
+        { name: "cors-anywhere", url: "https://cors-anywhere.herokuapp.com/" + url },
+        { name: "crossorigin.me", url: "https://crossorigin.me/" + url },
+        { name: "allorigins-raw", url: "https://api.allorigins.win/raw?url=" + encodeURIComponent(url) }
     ];
+}
+
+async function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function fetchScratchJson(url) {
     const attempts = buildScratchRequestUrls(url);
     let lastError = null;
 
-    for (const attempt of attempts) {
-        try {
-            const res = await fetch(attempt.url);
-            if (!res.ok) {
-                lastError = new Error("Scratch request failed at " + attempt.name + ": " + res.status);
-                continue;
-            }
-
-            const text = await res.text();
-            if (!text || text.trim() === "") {
-                lastError = new Error("Scratch request returned empty body at " + attempt.name);
-                continue;
-            }
-
+    for (let round = 0; round < 2; round++) {
+        for (const attempt of attempts) {
             try {
-                return JSON.parse(text);
-            } catch (e) {
-                lastError = e;
-                console.warn("JSON Parse Fehler bei", attempt.name, text);
+                const res = await fetch(attempt.url);
+                if (!res.ok) {
+                    lastError = new Error("Scratch request failed at " + attempt.name + ": " + res.status);
+                    continue;
+                }
+
+                const text = await res.text();
+                if (!text || text.trim() === "") {
+                    lastError = new Error("Scratch request returned empty body at " + attempt.name);
+                    continue;
+                }
+
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    lastError = e;
+                    console.warn("JSON Parse Fehler bei", attempt.name, text);
+                }
+            } catch (err) {
+                lastError = err;
+                console.warn("Scratch Request Fehler bei", attempt.name, err);
             }
-        } catch (err) {
-            lastError = err;
-            console.warn("Scratch Request Fehler bei", attempt.name, err);
+        }
+
+        if (round < 1) {
+            console.log("Retrying Scratch request after 2 seconds...");
+            await wait(2000);
         }
     }
 
     throw lastError || new Error("Alle Scratch-Proxies fehlgeschlagen");
+}
+
+async function fetchScratchImage(imageUrl) {
+    const attempts = buildScratchRequestUrls(imageUrl);
+    let lastError = null;
+
+    for (let round = 0; round < 2; round++) {
+        for (const attempt of attempts) {
+            try {
+                const res = await fetch(attempt.url);
+                if (!res.ok) {
+                    lastError = new Error("Scratch image failed at " + attempt.name + ": " + res.status);
+                    continue;
+                }
+
+                const blob = await res.blob();
+                if (!blob || blob.size === 0) {
+                    lastError = new Error("Scratch image returned empty blob at " + attempt.name);
+                    continue;
+                }
+
+                return URL.createObjectURL(blob);
+            } catch (err) {
+                lastError = err;
+                console.warn("Scratch Image Fehler bei", attempt.name, err);
+            }
+        }
+
+        if (round < 1) {
+            console.log("Retrying Scratch image request after 2 seconds...");
+            await wait(2000);
+        }
+    }
+
+    throw lastError || new Error("Scratch Image konnte nicht geladen werden");
 }
 
 async function loadUserProfile() {
@@ -576,8 +625,12 @@ async function loadUserProfile() {
         const url = "https://api.scratch.mit.edu/users/" + username;
         const data = await fetchScratchJson(url);
         const profileData = Array.isArray(data) ? data[0] : data;
-        if (profileData.profile?.images?.["90x90"]) {
-            document.getElementById("profile-image").src = profileData.profile.images["90x90"];
+        const imgUrl = profileData.profile?.images?.["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
+        try {
+            const imgObjectUrl = await fetchScratchImage(imgUrl);
+            document.getElementById("profile-image").src = imgObjectUrl;
+        } catch (e) {
+            document.getElementById("profile-image").src = imgUrl;
         }
     } catch (err) {
         console.log("Fehler beim Laden des Profils:", err);
@@ -592,27 +645,26 @@ async function loadProjects() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/projects";
         const data = await fetchScratchJson(url);
-        
+
         let projects = [];
         try {
             projects = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
-            console.error("JSON Parse Fehler Projects:", e, data.contents);
-            
+            console.error("JSON Parse Fehler Projects:", e, data && data.contents);
         }
 
         const firstGrid = document.getElementById("projects-grid");
         const moreGrid = document.getElementById("projects-more");
         const btn = document.getElementById("projects-btn");
 
-        projects.slice(0, 5).forEach(p => {
-            firstGrid.appendChild(createProjectCard(p));
-        });
+        for (const p of projects.slice(0, 5)) {
+            firstGrid.appendChild(await createProjectCard(p));
+        }
 
         if (projects.length > 5) {
-            projects.slice(5).forEach(p => {
-                moreGrid.appendChild(createProjectCard(p));
-            });
+            for (const p of projects.slice(5)) {
+                moreGrid.appendChild(await createProjectCard(p));
+            }
             btn.style.display = "block";
         }
     } catch (err) {
@@ -621,17 +673,33 @@ async function loadProjects() {
     }
 }
 
-function createProjectCard(p) {
+async function createProjectCard(p) {
     const card = document.createElement("div");
     card.className = "card";
+
     const title = p.title || "Kein Titel";
     const views = p.stats?.views ?? 0;
     const image = p.image || "https://cdn2.scratch.mit.edu/get_image/project/" + p.id + "_480x360.png";
-    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/project/default_480x360.png\'">' + 
-        '<div class="card-info">' +
-        '<b>' + title + '</b><br>' +
-        '👁 ' + views +
-        '</div>';
+
+    const img = document.createElement("img");
+    const fallbackImage = "https://cdn2.scratch.mit.edu/get_image/project/default_480x360.png";
+
+    try {
+        img.src = await fetchScratchImage(image);
+    } catch (e) {
+        img.src = fallbackImage;
+    }
+
+    img.onerror = function() {
+        this.src = fallbackImage;
+    };
+
+    const info = document.createElement("div");
+    info.className = "card-info";
+    info.innerHTML = '<b>' + title + '</b><br>' + '👁 ' + views;
+
+    card.appendChild(img);
+    card.appendChild(info);
     card.onclick = function() { openProject(p); };
     return card;
 }
@@ -648,27 +716,26 @@ async function loadFavorites() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/favorites";
         const data = await fetchScratchJson(url);
-        
+
         let favorites = [];
         try {
             favorites = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
-            console.error("JSON Parse Fehler Favorites:", e, data.contents);
-            
+            console.error("JSON Parse Fehler Favorites:", e, data && data.contents);
         }
 
         const firstGrid = document.getElementById("favorites-grid");
         const moreGrid = document.getElementById("favorites-more");
         const btn = document.getElementById("favorites-btn");
 
-        favorites.slice(0, 5).forEach(p => {
-            firstGrid.appendChild(createProjectCard(p));
-        });
+        for (const p of favorites.slice(0, 5)) {
+            firstGrid.appendChild(await createProjectCard(p));
+        }
 
         if (favorites.length > 5) {
-            favorites.slice(5).forEach(p => {
-                moreGrid.appendChild(createProjectCard(p));
-            });
+            for (const p of favorites.slice(5)) {
+                moreGrid.appendChild(await createProjectCard(p));
+            }
             btn.style.display = "block";
         }
     } catch (err) {
@@ -689,27 +756,26 @@ async function loadFollowing() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/following";
         const data = await fetchScratchJson(url);
-        
+
         let following = [];
         try {
             following = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
-            console.error("JSON Parse Fehler Following:", e, data.contents);
-            
+            console.error("JSON Parse Fehler Following:", e, data && data.contents);
         }
 
         const firstGrid = document.getElementById("following-grid");
         const moreGrid = document.getElementById("following-more");
         const btn = document.getElementById("following-btn");
 
-        following.slice(0, 5).forEach(u => {
-            firstGrid.appendChild(createUserCard(u));
-        });
+        for (const u of following.slice(0, 5)) {
+            firstGrid.appendChild(await createUserCard(u));
+        }
 
         if (following.length > 5) {
-            following.slice(5).forEach(u => {
-                moreGrid.appendChild(createUserCard(u));
-            });
+            for (const u of following.slice(5)) {
+                moreGrid.appendChild(await createUserCard(u));
+            }
             btn.style.display = "block";
         }
     } catch (err) {
@@ -730,50 +796,63 @@ async function loadFollowers() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/followers";
         const data = await fetchScratchJson(url);
-        
+
         let followers = [];
         try {
             followers = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
-            console.error("JSON Parse Fehler Followers:", e, data.contents);
-            
+            console.error("JSON Parse Fehler Followers:", e, data && data.contents);
         }
 
         const firstGrid = document.getElementById("followers-grid");
         const moreGrid = document.getElementById("followers-more");
         const btn = document.getElementById("followers-btn");
 
-        followers.slice(0, 5).forEach(u => {
-            firstGrid.appendChild(createUserCard(u));
-        });
+        for (const u of followers.slice(0, 5)) {
+            firstGrid.appendChild(await createUserCard(u));
+        }
 
         if (followers.length > 5) {
-            followers.slice(5).forEach(u => {
-                moreGrid.appendChild(createUserCard(u));
-            });
+            for (const u of followers.slice(5)) {
+                moreGrid.appendChild(await createUserCard(u));
+            }
             btn.style.display = "block";
         }
     } catch (err) {
-        console.log("Fehler beim Laden von Followern:", err);
-        document.getElementById("followers-grid").innerHTML = "<p>⚠️ Follower konnten nicht geladen werden.</p>";
+        console.log("Fehler beim Laden von Followers:", err);
+        document.getElementById("followers-grid").innerHTML = "<p>⚠️ Profile konnten nicht geladen werden.</p>";
     }
 }
 
-function toggleFollowers() {
-    const moreGrid = document.getElementById("followers-more");
-    const btn = document.getElementById("followers-btn");
-    moreGrid.classList.toggle("show");
-    btn.textContent = moreGrid.classList.contains("show") ? "👥 Weniger Follower anzeigen" : "👥 Mehr Follower anzeigen";
-}
-
-function createUserCard(user) {
+async function createUserCard(user) {
     const card = document.createElement("div");
     card.className = "user-card";
+
     const name = user.username || "Unbekannt";
-    const image = user.profile?.images?.["90x90"] || user.profile?.images["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
-    card.innerHTML = '<img src="' + image + '" onerror="this.src=\'https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png\'">' +
-        '<h3>' + name + '</h3>' +
-        '<p>Scratcher</p>';
+    const image = user.profile?.images?.["90x90"] || user.profile?.images?.["90x90"] || "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
+
+    const img = document.createElement("img");
+    const fallbackImage = "https://cdn2.scratch.mit.edu/get_image/user/default_90x90.png";
+
+    try {
+        img.src = await fetchScratchImage(image);
+    } catch (e) {
+        img.src = fallbackImage;
+    }
+
+    img.onerror = function() {
+        this.src = fallbackImage;
+    };
+
+    const title = document.createElement("h3");
+    title.textContent = name;
+
+    const type = document.createElement("p");
+    type.textContent = "Scratcher";
+
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(type);
     card.onclick = function() { window.location.href = window.location.pathname + "?u=" + name; };
     return card;
 }
