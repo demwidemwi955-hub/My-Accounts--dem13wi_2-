@@ -527,8 +527,14 @@ function buildScratchRequestUrls(url) {
     return [
         { name: "direct", url: url },
         { name: "corsproxy.io", url: "https://corsproxy.io/?" + encodeURIComponent(url) },
+        { name: "cors.io", url: "https://cors.io/?" + encodeURIComponent(url) },
+        { name: "cors.is", url: "https://cors.is/?" + encodeURIComponent(url) },
         { name: "allorigins", url: "https://api.allorigins.win/raw?url=" + encodeURIComponent(url) },
-        { name: "thingproxy", url: "https://thingproxy.freeboard.io/fetch/" + url }
+        { name: "thingproxy", url: "https://thingproxy.freeboard.io/fetch/" + url },
+        { name: "proxy.cors.sh", url: "https://proxy.cors.sh/" + url },
+        { name: "corsproxy.com", url: "https://www.corsproxy.com/" + encodeURIComponent(url) },
+        { name: "whateverorigin", url: "https://whateverorigin.org/get?url=" + encodeURIComponent(url) },
+        { name: "yacdn.org", url: "https://yacdn.org/proxy/" + url }
     ];
 }
 
