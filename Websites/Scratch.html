@@ -523,28 +523,55 @@ function goBack() {
 }
 
 // Load user profile info
+function buildScratchRequestUrls(url) {
+    return [
+        { name: "direct", url: url },
+        { name: "corsproxy.io", url: "https://corsproxy.io/?" + encodeURIComponent(url) },
+        { name: "allorigins", url: "https://api.allorigins.win/raw?url=" + encodeURIComponent(url) },
+        { name: "thingproxy", url: "https://thingproxy.freeboard.io/fetch/" + url }
+    ];
+}
+
+async function fetchScratchJson(url) {
+    const attempts = buildScratchRequestUrls(url);
+    let lastError = null;
+
+    for (const attempt of attempts) {
+        try {
+            const res = await fetch(attempt.url);
+            if (!res.ok) {
+                lastError = new Error("Scratch request failed at " + attempt.name + ": " + res.status);
+                continue;
+            }
+
+            const text = await res.text();
+            if (!text || text.trim() === "") {
+                lastError = new Error("Scratch request returned empty body at " + attempt.name);
+                continue;
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                lastError = e;
+                console.warn("JSON Parse Fehler bei", attempt.name, text);
+            }
+        } catch (err) {
+            lastError = err;
+            console.warn("Scratch Request Fehler bei", attempt.name, err);
+        }
+    }
+
+    throw lastError || new Error("Alle Scratch-Proxies fehlgeschlagen");
+}
+
 async function loadUserProfile() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username;
-        const proxyUrl = url; //no proxy anymore
-        const res = await fetch(proxyUrl);
-        let data = res.ok ? await res.json() : null;
-        
-        if (!data && res.headers.get('content-type')?.includes('text')) {
-            const text = await res.text();
-            try {
-                data = typeof text === 'string' ? JSON.parse(text) : text;
-            } catch (e) {
-                console.error("JSON Parse Fehler:", e);
-                return;
-            }
-        }
-        
-        if (data) {
-            const profileData = Array.isArray(data) ? data[0] : data;
-            if (profileData.profile?.images?.["90x90"]) {
-                document.getElementById("profile-image").src = profileData.profile.images["90x90"];
-            }
+        const data = await fetchScratchJson(url);
+        const profileData = Array.isArray(data) ? data[0] : data;
+        if (profileData.profile?.images?.["90x90"]) {
+            document.getElementById("profile-image").src = profileData.profile.images["90x90"];
         }
     } catch (err) {
         console.log("Fehler beim Laden des Profils:", err);
@@ -558,16 +585,14 @@ loadUserProfile();
 async function loadProjects() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/projects";
-        const proxyUrl = url; //no proxy
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
+        const data = await fetchScratchJson(url);
         
         let projects = [];
         try {
             projects = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
             console.error("JSON Parse Fehler Projects:", e, data.contents);
-            return;
+            
         }
 
         const firstGrid = document.getElementById("projects-grid");
@@ -616,16 +641,14 @@ function toggleProjects() {
 async function loadFavorites() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/favorites";
-        const proxyUrl = url; //dont need proxy
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
+        const data = await fetchScratchJson(url);
         
         let favorites = [];
         try {
             favorites = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
             console.error("JSON Parse Fehler Favorites:", e, data.contents);
-            return;
+            
         }
 
         const firstGrid = document.getElementById("favorites-grid");
@@ -659,16 +682,14 @@ function toggleFavorites() {
 async function loadFollowing() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/following";
-        const proxyUrl = url; // dont need proxy
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
+        const data = await fetchScratchJson(url);
         
         let following = [];
         try {
             following = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
             console.error("JSON Parse Fehler Following:", e, data.contents);
-            return;
+            
         }
 
         const firstGrid = document.getElementById("following-grid");
@@ -702,16 +723,14 @@ function toggleFollowing() {
 async function loadFollowers() {
     try {
         const url = "https://api.scratch.mit.edu/users/" + username + "/followers";
-        const proxyUrl = url;
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
+        const data = await fetchScratchJson(url);
         
         let followers = [];
         try {
             followers = Array.isArray(data) ? data : (typeof data.contents === 'string' ? JSON.parse(data.contents) : data.contents);
         } catch (e) {
             console.error("JSON Parse Fehler Followers:", e, data.contents);
-            return;
+            
         }
 
         const firstGrid = document.getElementById("followers-grid");
